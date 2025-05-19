@@ -22,11 +22,8 @@ const limit = 10;
 let isLoading = false;
 let hasMore = true;
 /////////////////////////////////////
-const homeSvg=document.getElementById("home-svg");
-const cartSvg=document.getElementById("cart-svg");
-const orderSvg=document.getElementById("order-svg");
-const walletSvg=document.getElementById("wallet-svg");
-const profileSvg=document.getElementById("profile-svg");
+const homeBtn=document.getElementById("home-btn");
+const cartBtn=document.getElementById("cart-btn");
 
 
 
@@ -96,6 +93,7 @@ const profileSvg=document.getElementById("profile-svg");
   addBrand()
 
 
+
   ////////////////////////////////////////////////////
 
 
@@ -147,44 +145,38 @@ const profileSvg=document.getElementById("profile-svg");
   loadMoreShoes();
 
   ///////////////////////////////////////////////////////////////////
+// همه دکمه‌ها رو انتخاب می‌کنیم
+const buttons = document.querySelectorAll('button');
 
-// آرایه‌ای از تمام آیکن‌ها برای راحتی
-const allSvgs = [homeSvg, cartSvg,orderSvg,walletSvg,profileSvg];
-
-// یک تابع برای تنظیم رنگ‌ها
-function setActiveSvg(activeSvg) {
-  allSvgs.forEach((svg) => {
-    svg.classList.remove("fill-black");
-    svg.classList.add("fill-gray-400"); // طوسی
-  });
-
-  activeSvg.classList.remove("fill-gray-400");
-  activeSvg.classList.add("fill-black"); // مشکی
+// تابعی برای تغییر رنگ یک SVG
+function setSVGColor(svg, color) {
+  const paths = svg.querySelectorAll('path');
+  paths.forEach(path => path.setAttribute('fill', color));
 }
 
-// روی کلیک هر SVG تنظیم کن
-homeSvg.addEventListener("click", () => {
-  setActiveSvg(homeSvg);
-  location.href = "/home";
+// روی هر دکمه کلیک بشه:
+buttons.forEach(button => {
+  button.addEventListener('click', () => {
+    // همه دکمه‌ها رو به رنگ طوسی برمی‌گردونیم
+    buttons.forEach(btn => {
+      const svg = btn.querySelector('svg');
+      setSVGColor(svg, '#64748b'); // یا '#212529'، بسته به رنگ طوسی شما
+    });
+
+    // دکمه کلیک‌شده رو مشکی می‌کنیم
+    const currentSvg = button.querySelector('svg');
+    setSVGColor(currentSvg, '#020617'); // مشکی
+  });
 });
 
-cartSvg.addEventListener("click", () => {
-  setActiveSvg(cartSvg);
-  location.href = "/cart";
+homeBtn.addEventListener("click",()=>{
+    location.href="/home"
 });
-orderSvg.addEventListener("click", () => {
-    setActiveSvg(orderSvg);
-    location.href = "/home";
-  });
-  walletSvg.addEventListener("click", () => {
-    setActiveSvg(walletSvg);
-    location.href = "/home";
-  });
-  profileSvg.addEventListener("click", () => {
-    setActiveSvg(profileSvg);
-    location.href = "/home";
-  });
-  
+
+cartBtn.addEventListener("click",()=>{
+    location.href="/cart"
+});
+
   
 
   
