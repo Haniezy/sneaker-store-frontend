@@ -10,6 +10,7 @@ export default {
     "./login.html",
     "./signup.html",
     "./home.html",
+    "./discription.html",
     "./cart.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],

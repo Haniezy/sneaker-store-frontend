@@ -16,3 +16,17 @@
     animation: slow-spin 2s linear infinite;
   }
 
+
+  .swiper-pagination-bullet {
+    background-color: black !important;
+    opacity: 0.6;
+    transition: all 0.3s ease;
+  }
+
+  /* هنگام فعال بودن: کمی پهن‌تر و واضح‌تر */
+  .swiper-pagination-bullet-active {
+    width: 20px;
+    border-radius: 8px;
+    opacity: 1;
+  }
+
