@@ -23,9 +23,9 @@
     transition: all 0.3s ease;
   }
 
-  /* هنگام فعال بودن: کمی پهن‌تر و واضح‌تر */
+ 
   .swiper-pagination-bullet-active {
-    width: 20px;
+    width: 30px;
     border-radius: 8px;
     opacity: 1;
   }

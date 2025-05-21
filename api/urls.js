@@ -10,6 +10,7 @@ export const urls = {
   },
 sneaker:{
     getshoes:"/sneaker",
-    brands:"/sneaker/brands"
+    brands:"/sneaker/brands",
+    item:"/sneaker/item",
 }
 };

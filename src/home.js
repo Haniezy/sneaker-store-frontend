@@ -1,5 +1,5 @@
 
-import { getsneakerBrands, getsneakerInfo } from "../api/sneaker";
+import { getSneakerBrands, getsneakerInfo } from "../api/sneaker";
 import { getUserInfo } from "../api/user";
 import { tokenName } from "../lib/constant";
 
@@ -14,16 +14,12 @@ const homeUserName=document.getElementById('home-username');
 //////////////////////////////
 const greetingBtn=document.getElementById('greeting-btn');
 //////////////////////////
-const brandItem=document.getElementById('brands');
+
 ///////////////////////////////
-const shoseItem=document.getElementById('shoes-item');
-let currentPage = 1;
-const limit = 10;
-let isLoading = false;
-let hasMore = true;
-/////////////////////////////////////
-const homeBtn=document.getElementById("home-btn");
-const cartBtn=document.getElementById("cart-btn");
+
+
+
+
 
 
 
@@ -72,110 +68,164 @@ const cartBtn=document.getElementById("cart-btn");
 
   
 
-  async function addBrand() {
-    try {
-      const sneakerBrands = await getsneakerBrands(); 
-  
-      let html = ""; 
-      sneakerBrands.forEach((item) => {
-        html += `
-          <div class="flex items-center justify-center border border-2 border-gray-800 rounded-full px-5 font-semibold">
-            <p class="text-gray-900 text-base">${item}</p>
-          </div>`;
-      });
-  
-      brandItem.innerHTML += html; 
-    } catch (error) {
-      console.log(error);
-    }
-  }
 
-  addBrand()
+let currentPage = 1;
+let totalPages = 1;
+let currentBrand = null;
+let isLoading = false;
 
+const brandItem = document.getElementById("brands"); 
+const sneakerList = document.getElementById("sneaker-list");
 
+async function addBrand() {
+  try {
+    const sneakerBrands = await getSneakerBrands();
 
-  ////////////////////////////////////////////////////
+    let html = `
+      <div class="all-button flex items-center justify-center border-2 border-gray-800 rounded-full px-5 font-semibold cursor-pointer bg-gray-800 text-white">
+        <p class=" text-base">All</p>
+      </div>
+    `;
 
-
-  async function loadMoreShoes() {
-    if (isLoading || !hasMore) return;
-    isLoading = true;
-  
-    try {
-      const response = await getsneakerInfo(currentPage, limit);
-      const sneakerShoes = response.data;
-  
-      if (sneakerShoes.length === 0) {
-        hasMore = false; // دیگه چیزی نیست
-        return;
-      }
-  
-      let html = "";
-      sneakerShoes.forEach((shoe) => {
-        html += `
-          <div class="h-60 ">
-            <div class="h-[182px] w-[182px] rounded-3xl bg-gray-100 flex justify-center items-center">
-              <img class="rounded-3xl h-44 w-44" src="${shoe.imageURL}" alt="${shoe.name}">
-            </div>
-            <p class="text-xl font-extrabold mt-2 truncate whitespace-nowrap overflow-hidden max-w-[180px]">${shoe.name}</p>
-            <p class="text-base font-semibold">$ ${shoe.price}</p>
-          </div>
-        `;
-      });
-  
-      shoseItem.innerHTML += html;
-      currentPage++; // صفحه بعدی
-    } catch (error) {
-      console.log(error);
-    } finally {
-      isLoading = false;
-    }
-  }
-  
-  window.addEventListener("scroll", () => {
-    const scrollTop = window.scrollY;
-    const windowHeight = window.innerHeight;
-    const documentHeight = document.documentElement.scrollHeight;
-  
-    if (scrollTop + windowHeight >= documentHeight - 300) {
-      loadMoreShoes();
-    }
-  });
-
-  loadMoreShoes();
-
-  ///////////////////////////////////////////////////////////////////
-// همه دکمه‌ها رو انتخاب می‌کنیم
-const buttons = document.querySelectorAll('button');
-
-// تابعی برای تغییر رنگ یک SVG
-function setSVGColor(svg, color) {
-  const paths = svg.querySelectorAll('path');
-  paths.forEach(path => path.setAttribute('fill', color));
-}
-
-// روی هر دکمه کلیک بشه:
-buttons.forEach(button => {
-  button.addEventListener('click', () => {
-    // همه دکمه‌ها رو به رنگ طوسی برمی‌گردونیم
-    buttons.forEach(btn => {
-      const svg = btn.querySelector('svg');
-      setSVGColor(svg, '#64748b'); // یا '#212529'، بسته به رنگ طوسی شما
+    sneakerBrands.forEach((item) => {
+      html += `
+        <div data-brand="${item}" class="brand-button flex items-center justify-center border-2 border-gray-800 rounded-full px-5 font-semibold cursor-pointer">
+          <p class="text-gray-900 text-base">${item}</p>
+        </div>`;
     });
 
-    // دکمه کلیک‌شده رو مشکی می‌کنیم
-    const currentSvg = button.querySelector('svg');
-    setSVGColor(currentSvg, '#020617'); // مشکی
+    brandItem.innerHTML = html;
+
+ 
+    const allBtn = brandItem.querySelector(".all-button");
+    allBtn.addEventListener("click", () => {
+      currentPage = 1;
+      currentBrand = null;
+      loadSneakersByBrand();
+      highlightSelected(allBtn);
+    });
+
+
+    const buttons = document.querySelectorAll(".brand-button");
+    buttons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const brand = btn.dataset.brand;
+        currentPage = 1;
+        currentBrand = brand;
+        loadSneakersByBrand();
+        highlightSelected(btn);
+      });
+    });
+
+  } catch (error) {
+    console.error("Error loading brands:", error);
+  }
+}
+
+async function loadSneakersByBrand(brand = currentBrand, page = currentPage) {
+
+  isLoading = true;
+ 
+    try {
+        const response = await getsneakerInfo(page, 10, brand ? [brand] : []);
+        const sneakers = response.data;
+        totalPages = response.totalPages;
+    
+        if (page === 1) sneakerList.innerHTML = "";
+    
+        sneakers.forEach((shoe) => {
+          sneakerList.innerHTML += `
+            <div data-id="${shoe.id}" class="p-4 rounded-2xl list-shoe-item">
+              <img src="${shoe.imageURL}" alt="${shoe.name}" class="w-full h-40 object-cover rounded-2xl" />
+              <p class="mt-2 font-bold">${shoe.name}</p>
+             
+              <p class="text-base">$${shoe.price}</p>
+            </div>
+          `;
+        });
+
+        
+    
+      } catch (err) {
+        console.error("Error loading sneakers by brand:", err);
+      } finally {
+        isLoading = false;
+      }
+
+}
+
+sneakerList.addEventListener("click", (e) => {
+    const item = e.target.closest(".list-shoe-item");
+    if (item) {
+      const id = item.dataset.id;
+      // می‌تونی ID رو توی query string هم بفرستی مثلاً:
+      location.href = `/discription.html?id=${id}`;
+    }
   });
-});
 
-homeBtn.addEventListener("click",()=>{
-    location.href="/home"
-});
+function highlightSelected(activeBtn) {
+    const allBtns = document.querySelectorAll(".brand-button, .all-button");
+  
+    allBtns.forEach((btn) => {
+      btn.classList.remove("bg-gray-800");
+      const text = btn.querySelector("p");
+      if (text) {
+        text.classList.remove("text-white");
+        text.classList.add("text-gray-900");
+      }
+    });
+  
+    activeBtn.classList.add("bg-gray-800");
+    const activeText = activeBtn.querySelector("p");
+    if (activeText) {
+      activeText.classList.remove("text-gray-900");
+      activeText.classList.add("text-white");
+    }
+  }
 
-cartBtn.addEventListener("click",()=>{
-    location.href="/cart"
-});
+  window.addEventListener("scroll", () => {
+    const nearBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 100;
+  
+    if (nearBottom && !isLoading && currentPage < totalPages) {
+      currentPage++;
+      loadSneakersByBrand(currentBrand, currentPage);
+    }
+  });
+
+// شروع اولیه
+addBrand();
+loadSneakersByBrand();
+
+
+
+
+  ///////////////////////////////////////////////////////////////////
+  document.addEventListener('DOMContentLoaded', () => {
+    const navLinks = document.querySelectorAll('nav a');
+  
+    navLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        // حذف رنگ مشکی از همه و تنظیم طوسی
+        navLinks.forEach(l => l.classList.remove('text-black'));
+        navLinks.forEach(l => l.classList.add('text-gray-500'));
+  
+        // رنگ مشکی به لینک کلیک‌شده
+        link.classList.add('text-black');
+        link.classList.remove('text-gray-500');
+  
+        // گرفتن مقصد از data-target
+        const target = link.getAttribute('data-target');
+  
+        // فقط اگر target وجود داشته باشه، به اون صفحه برو
+        if (target) {
+          window.location.href = target;
+        } else {
+          // نذار صفحه رفرش بشه
+          e.preventDefault();
+        }
+      });
+    });
+  });
 
   
 
