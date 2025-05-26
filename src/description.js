@@ -1,6 +1,14 @@
 import { getSneakerItem } from "../api/sneaker";
 
-const colorStylesMap={"black":"bg-black","brown":"bg-amber-600","white":"bg-gray-600","blue":"bg-blue-600","red":"bg-red-600"}
+
+
+const colorStylesMap = {
+  black: "bg-black",
+  brown: "bg-amber-600",
+  white: "bg-gray-600",
+  blue: "bg-blue-600",
+  red: "bg-red-600",
+};
 
 const params = new URLSearchParams(window.location.search);
 const id = params.get("id");
@@ -29,12 +37,11 @@ async function loadItem(id) {
     <div class="swiper-pagination"></div>
   </div>`;
 
-  
-const leftBack=document.getElementById("left-back");
+  const leftBack = document.getElementById("left-back");
 
-leftBack.addEventListener('click',()=>{
-  location.href="/home"
-})
+  leftBack.addEventListener("click", () => {
+    location.href = "/home";
+  });
 
   const swiper = new Swiper(".swiper", {
     loop: true,
@@ -46,8 +53,10 @@ leftBack.addEventListener('click',()=>{
     },
   });
 
-  descInfo.innerHTML=`<div class="mt-5 flex justify-between items-end">
-            <p class="text-3xl font-semibold">${response.name}</p><img src="public/assets/Vector.svg" alt="">
+  descInfo.innerHTML = `<div class="mt-5 flex justify-between items-end">
+            <p class="text-3xl font-semibold">${
+              response.name
+            }</p><img src="public/assets/Vector.svg" alt="">
         </div>
         <div class="mt-4 flex items-center">
             <div class="bg-gray-200 h-6 w-20 rounded flex justify-center items-center ">
@@ -74,21 +83,27 @@ leftBack.addEventListener('click',()=>{
 
         <div class="flex">
             <div class="flex text-right items-end h-10 w-full mt-2 space-x-2">
-              ${response.sizes.split("|").map((size)=>
-                `<div class="w-10 h-10 rounded-full  border-2 border-gray-400 flex items-center justify-center">
+              ${response.sizes
+                .split("|")
+                .map(
+                  (size) =>
+                    `<div class="w-10 h-10 rounded-full  border-2 border-gray-400 flex items-center justify-center">
                     <p class="text-gray-500">${size}</p>
                 </div>`
-                
-              ).join("")}
+                )
+                .join("")}
                 
 
             </div>
 
             <div class="flex text-right items-end h-10 w-full mt-2 space-x-2">
-            ${response.colors.split("|").map((color)=>
-              `<div class="w-10 h-10 rounded-full  ${colorStylesMap[color]} flex items-center justify-center"></div>`
-              
-            ).join("")}
+            ${response.colors
+              .split("|")
+              .map(
+                (color) =>
+                  `<div class="w-10 h-10 rounded-full  ${colorStylesMap[color]} flex items-center justify-center"></div>`
+              )
+              .join("")}
 
             </div>
         </div>
@@ -112,13 +127,42 @@ leftBack.addEventListener('click',()=>{
                 <p class="text-xl mt-1 font-semibold">$${response.price}</p>
             </div>
             <div class="w-64 h-14 bg-black rounded-full flex justify-center items-center space-x-4">
-                <img src="public/assets/lock_30dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" alt="lock">
-                <p class="text-lg text-white font-medium">Add to Cart</p>
+               <button id="add-to-cart-btn" class="w-64 h-14 bg-black rounded-full flex justify-center items-center space-x-4">
+  <img src="public/assets/lock_30dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" alt="lock">
+  <p class="text-lg text-white font-medium">Add to Cart</p>
+</button>
             </div>
 
-        </div>`
+        </div>`;
+
+
+        const addToCartBtn = document.getElementById("add-to-cart-btn");
+
+addToCartBtn.addEventListener("click", () => {
+  const product = {
+    id: response.id,
+    name: response.name,
+    price: response.price,
+    imageURL: response.imageURL,
+  };
+
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+cart.push(product);
+
+localStorage.setItem("cart",JSON.stringify(cart));
+location.href = "/cart.html";
+
+alert("Product added successfully");
+});
+
+
 }
 
+
+
 loadItem(id);
+
+
 
 

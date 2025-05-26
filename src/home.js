@@ -158,7 +158,7 @@ sneakerList.addEventListener("click", (e) => {
     const item = e.target.closest(".list-shoe-item");
     if (item) {
       const id = item.dataset.id;
-      // می‌تونی ID رو توی query string هم بفرستی مثلاً:
+    
       location.href = `/discription.html?id=${id}`;
     }
   });
@@ -192,7 +192,7 @@ function highlightSelected(activeBtn) {
     }
   });
 
-// شروع اولیه
+
 addBrand();
 loadSneakersByBrand();
 
@@ -205,22 +205,21 @@ loadSneakersByBrand();
   
     navLinks.forEach(link => {
       link.addEventListener('click', (e) => {
-        // حذف رنگ مشکی از همه و تنظیم طوسی
+ 
         navLinks.forEach(l => l.classList.remove('text-black'));
         navLinks.forEach(l => l.classList.add('text-gray-500'));
   
-        // رنگ مشکی به لینک کلیک‌شده
+
         link.classList.add('text-black');
         link.classList.remove('text-gray-500');
-  
-        // گرفتن مقصد از data-target
+
         const target = link.getAttribute('data-target');
   
-        // فقط اگر target وجود داشته باشه، به اون صفحه برو
+    
         if (target) {
           window.location.href = target;
         } else {
-          // نذار صفحه رفرش بشه
+ 
           e.preventDefault();
         }
       });
